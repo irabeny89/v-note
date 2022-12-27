@@ -56,6 +56,7 @@ export default {
             }
           : note
       );
+      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
     },
     deleteNote(id: string) {
       this.notes = this.notes.filter((note) => note.id !== id);
@@ -72,6 +73,7 @@ export default {
             }
           : note
       );
+      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
     },
   },
   mounted() {
