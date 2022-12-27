@@ -1,4 +1,4 @@
-export type TodoT = {
+export type NoteT = {
   id: string;
   title: string;
   detail?: string;
