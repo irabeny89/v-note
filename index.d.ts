@@ -6,3 +6,5 @@ export type NoteT = {
   createdAt: string;
   updatedAt: string;
 }
+
+export type NotesDataT = Record<"notes", NoteT[]>

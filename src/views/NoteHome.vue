@@ -1,84 +1,51 @@
-<script setup lang="ts">
-import Note from "../components/Note.vue";
-import type { NoteT } from "index";
-import { NOTES_KEY } from "@/config";
-import NoteInputDialog from "@/components/NoteInputDialog.vue";
-</script>
 <script lang="ts">
-const getNotesFromStorage = (localStorage: Storage) => {
-  const string_notes = localStorage.getItem(NOTES_KEY);
-  return string_notes ? (JSON.parse(string_notes) as NoteT[]) : [];
-};
+import { reactive, computed } from "vue";
+import Note from "@/components/Note.vue";
+import type { NoteT } from "index";
+import NoteInputDialog from "@/components/NoteInputDialog.vue";
+import useToggle from "@/hooks/useToggle";
+import {
+  addNoteFn,
+  clearNotesFn,
+  deleteNoteFn,
+  editNoteFn,
+  getDoneNote,
+  getNotesFromStorage,
+  sortUndoneFirst,
+  toggleDoneFn,
+} from "@/utils/homeUtils";
 
 export default {
-  data(): {
-    notes: NoteT[];
-    showDialog: boolean;
-  } {
+  setup() {
+    const notesData = reactive<Record<"notes", NoteT[]>>({
+      notes: getNotesFromStorage(localStorage),
+    });
+
+    const sortedNotes = computed(() =>
+      [...notesData.notes].sort(sortUndoneFirst)
+    );
+    const notesCount = computed(() => notesData.notes.length);
+    const doneNotesCount = computed(
+      () => notesData.notes.filter(getDoneNote).length
+    );
+    const pendingNotes = computed(
+      () => notesCount.value - doneNotesCount.value
+    );
+
     return {
-      notes: [],
-      showDialog: false,
+      ...useToggle(),
+      sortedNotes,
+      notesCount,
+      doneNotesCount,
+      pendingNotes,
+      addNote: addNoteFn(notesData),
+      clearNotes: clearNotesFn(notesData),
+      toggleDone: toggleDoneFn(notesData),
+      deleteNote: deleteNoteFn(notesData),
+      editNote: editNoteFn(notesData),
     };
   },
-  computed: {
-    sortedNotes() {
-      return this.notes.sort((a, b) => Number(a.isDone) - Number(b.isDone));
-    },
-    notesCount() {
-      return this.sortedNotes.length;
-    },
-    doneNotesCount() {
-      return this.sortedNotes.filter((note) => note.isDone).length;
-    },
-    pendingNotes() {
-      return this.sortedNotes.length - this.doneNotesCount;
-    },
-  },
-  methods: {
-    toggleShowDialog() {
-      this.showDialog = !this.showDialog;
-    },
-    addNote(note: NoteT) {
-      this.notes.push(note);
-      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
-    },
-    clearNotes() {
-      localStorage.removeItem(NOTES_KEY);
-      this.notes = [];
-    },
-    toggleDone(id: string) {
-      this.notes = this.notes.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              isDone: !note.isDone,
-              updatedAt: new Date().toLocaleString(),
-            }
-          : note
-      );
-      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
-    },
-    deleteNote(id: string) {
-      this.notes = this.notes.filter((note) => note.id !== id);
-      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
-    },
-    editNote(id: string, title: string, detail?: string) {
-      this.notes = this.notes.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              title,
-              detail,
-              updatedAt: new Date().toLocaleString(),
-            }
-          : note
-      );
-      localStorage.setItem(NOTES_KEY, JSON.stringify(this.notes));
-    },
-  },
-  mounted() {
-    this.notes = getNotesFromStorage(localStorage);
-  },
+  components: { Note, NoteInputDialog },
 };
 </script>
 
