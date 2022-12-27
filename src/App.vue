@@ -11,7 +11,7 @@ import { RouterView } from "vue-router";
       width="125"
       height="125"
     />
-    <h2 style="text-align: center">V-Todo App</h2>
+    <h2 style="text-align: center">V-Notes</h2>
   </header>
 
   <RouterView />
