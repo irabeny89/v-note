@@ -1,1 +1,1 @@
-export const NOTES_KEY = "vtodo"
+export const NOTES_KEY = "vNotes"
