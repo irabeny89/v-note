@@ -1,1 +1,1 @@
-export const TODOS_KEY = "vtodo"
+export const NOTES_KEY = "vtodo"
