@@ -79,7 +79,6 @@ export default {
   mounted() {
     this.notes = getNotesFromStorage(localStorage);
   },
-  components: { NoteInputDialog },
 };
 </script>
 
