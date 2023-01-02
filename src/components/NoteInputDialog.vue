@@ -45,46 +45,49 @@ export default {
 </script>
 
 <template>
-  <div v-show="showDialog" class="dialog-backdrop">
-    <dialog open>
-      <div class="dialog-header">
-        <h3 v-if="noteId">Edit Note</h3>
-        <h3 v-else-if="!noteId">Add Note</h3>
-        <div
-          @click="toggleShowDialog()"
-          title="close dialog"
-          class="dialog-close"
-          aria-label="close modal"
-        >
-          X
+  <div
+    v-show="showDialog"
+    @click="toggleShowDialog"
+    class="dialog-backdrop"
+  ></div>
+  <dialog :open="showDialog">
+    <div class="dialog-header">
+      <h3 v-if="noteId">Edit Note</h3>
+      <h3 v-else-if="!noteId">Add Note</h3>
+      <div
+        @click="toggleShowDialog()"
+        title="close dialog"
+        class="dialog-close"
+        aria-label="close modal"
+      >
+        X
+      </div>
+    </div>
+    <form @submit="handleSubmit">
+      <div class="dialog-body">
+        <div>
+          <input
+            required
+            autofocus
+            name="title"
+            v-model="title"
+            type="text"
+            placeholder="Note title..."
+            class="title-input"
+          />
+        </div>
+        <div>
+          <textarea
+            name="detail"
+            v-model="detail"
+            placeholder="Optional details..."
+            cols="30"
+          />
         </div>
       </div>
-      <form @submit="handleSubmit">
-        <div class="dialog-body">
-          <div>
-            <input
-              required
-              autofocus
-              name="title"
-              v-model="title"
-              type="text"
-              placeholder="Note title..."
-              class="title-input"
-            />
-          </div>
-          <div>
-            <textarea
-              name="detail"
-              v-model="detail"
-              placeholder="Optional details..."
-              cols="30"
-            />
-          </div>
-        </div>
-        <button type="submit">Submit</button>
-      </form>
-    </dialog>
-  </div>
+      <button type="submit">Submit</button>
+    </form>
+  </dialog>
 </template>
 
 <style scoped lang="css">
@@ -94,9 +97,12 @@ textarea {
   width: 100%;
 }
 dialog {
+  width: 90vw;
+  position: fixed;
+  top: 10.5rem;
+  left: 5vw;
   border: none;
-  margin: 0 auto;
-  z-index: 3;
+  z-index: 1;
 }
 form > button {
   background-color: #41b883;
@@ -129,8 +135,18 @@ form > button {
   width: 100%;
   height: 100%;
   position: fixed;
-  top: 10rem;
+  top: 0;
   left: 0;
-  z-index: 2;
+  z-index: 1;
+}
+@media (min-width: 768px) {
+  dialog {
+    width: 50vw;
+    position: fixed;
+    top: 10rem;
+    left: 25vw;
+    border: none;
+    z-index: 1;
+  }
 }
 </style>
