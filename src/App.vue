@@ -4,6 +4,7 @@ import { RouterView } from "vue-router";
 
 <template>
   <header>
+    <div style="text-align: center">Ernest</div>
     <img
       alt="Vue logo"
       class="logo"
@@ -11,9 +12,8 @@ import { RouterView } from "vue-router";
       width="125"
       height="125"
     />
-    <h2 style="text-align: center">V-Notes</h2>
+    <h1 style="text-align: center">V-Notes</h1>
   </header>
-
   <RouterView />
 </template>
 
