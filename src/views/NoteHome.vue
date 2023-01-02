@@ -64,7 +64,7 @@ export default {
     />
 
     <div class="action-buttons">
-      <button @click="toggleShowDialog()">Add Note</button>
+      <button @click="toggleShowDialog">Add Note</button>
       <button @click="clearNotes" v-show="!!notesCount" class="clear-button">
         Clear All
       </button>
