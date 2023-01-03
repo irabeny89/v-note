@@ -1,79 +1,62 @@
 <script setup lang="ts">
-import type { NoteT } from "index";
-import NoteInputDialog from "./NoteInputDialog.vue";
-defineProps<{
-  note: NoteT;
-  toggleDone: (id: string) => void;
-  deleteNote: (id: string) => void;
-  editNote: (id: string, title: string, detail?: string) => void;
+import useToggle from "@/hooks/useToggle";
+import useNoteStore from "@/stores/useNoteStore";
+import { defineAsyncComponent } from "vue";
+
+const NoteInput = defineAsyncComponent(
+  () => import("@/components/NoteInput.vue")
+);
+
+
+const { createdAt, id, isDone, title, updatedAt, detail } = defineProps<{
+  id: string;
+  title: string;
+  detail?: string;
+  isDone: boolean;
+  createdAt: string;
+  updatedAt: string;
 }>();
-</script>
-<script lang="ts">
-export default {
-  data() {
-    return {
-      showDialog: false,
-    };
-  },
-  computed: {
-    styleNote() {
-      return this.note.isDone
-        ? { outline: "none", color: "#41b883" }
-        : undefined;
-    },
-  },
-  methods: {
-    toggleShowDialog() {
-      this.showDialog = !this.showDialog;
-    },
-  },
-};
+
+const { deleteNote, toggleDone } = useNoteStore();
+
+const { showDialog, toggleShowDialog } = useToggle();
 </script>
 
 <template>
-  <div class="container" :style="styleNote">
-    <NoteInputDialog
-      :noteId="note.id"
-      :noteTitle="note.title"
-      :noteDetail="note.detail"
+  <div
+    class="container"
+    :style="isDone ? { outline: 'none', color: '#41b883' } : undefined"
+  >
+    <NoteInput
+      :edit="{ id, detail, title }"
       :showDialog="showDialog"
-      :editNote="editNote"
       :toggleShowDialog="toggleShowDialog"
     />
     <details>
       <div class="note-detail">
-        {{ note.detail }}
+        {{ detail }}
       </div>
 
       <summary>
-        {{ note.title }}
+        {{ title }}
       </summary>
 
       <div class="note-time">
         <div>
-          <small>CreatedAt: {{ note.createdAt }}</small>
+          <small>CreatedAt: {{ createdAt }}</small>
         </div>
         <div>
-          <small>UpdatedAt: {{ note.updatedAt }}</small>
+          <small>UpdatedAt: {{ updatedAt }}</small>
         </div>
       </div>
 
       <div class="action-buttons">
-        <button @click="toggleShowDialog" class="edit-button">Edit</button
-        ><button @click="deleteNote(note.id)" class="delete-button">
-          Delete</button
-        ><button
-          v-show="note.isDone"
-          @click="toggleDone(note.id)"
-          class="done-button"
-        >
+        <button @click="toggleShowDialog" class="edit-button">Edit</button>
+        <button @click="deleteNote(id)" class="delete-button">Delete</button>
+        <button v-show="isDone" @click="toggleDone(id)" class="done-button">
           Pend
         </button>
-        <button
-          v-show="!note.isDone"
-          @click="toggleDone(note.id)"
-          class="done-button"
-        >
+        <button v-show="!isDone" @click="toggleDone(id)" class="done-button">
           Done
         </button>
       </div>

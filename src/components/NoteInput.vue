@@ -1,46 +1,38 @@
 <script setup lang="ts">
-import type { NoteT } from "index";
+import useNoteStore from "@/stores/useNoteStore";
+import type { NoteEditDataT } from "index";
+import { reactive } from "vue";
 
-defineProps<{
+const { showDialog, edit, toggleShowDialog } = defineProps<{
+  edit?: NoteEditDataT;
   showDialog: boolean;
-  noteId?: string;
-  noteTitle?: string;
-  noteDetail?: string;
   toggleShowDialog: () => void;
-  addNote?: (Note: NoteT) => void;
-  editNote?: (id: string, title: string, detail?: string) => void;
 }>();
-</script>
-<script lang="ts">
-export default {
-  data() {
-    return {
-      title: this.noteTitle ?? "",
-      detail: this.noteDetail ?? "",
-    };
-  },
-  methods: {
-    handleSubmit(e: Event) {
-      e.preventDefault();
-      const currentDateTime = new Date().toLocaleString();
-      if (this.title) {
-        this.addNote &&
-          this.addNote({
-            createdAt: currentDateTime,
-            updatedAt: currentDateTime,
-            isDone: false,
-            title: this.title,
-            detail: this.detail,
-            id: Date.now() + "",
-          });
-        this.editNote &&
-          this.noteId &&
-          this.editNote(this.noteId, this.title, this.detail);
-        this.title = this.detail = "";
-        this.toggleShowDialog();
-      }
-    },
-  },
+
+const { addNote, editNote } = useNoteStore();
+
+const inputData = reactive({
+  title: edit?.title ?? "",
+  detail: edit?.detail ?? "",
+});
+
+const handleSubmit = (e: Event) => {
+  e.preventDefault();
+  if (edit) {
+    editNote({ ...edit, ...inputData });
+  } else {
+    const currentDateTime = new Date().toLocaleString();
+    addNote({
+      createdAt: currentDateTime,
+      updatedAt: currentDateTime,
+      id: Date.now() + "",
+      isDone: false,
+      ...inputData,
+    });
+
+    inputData.title = inputData.detail = "";
+  }
+  toggleShowDialog();
 };
 </script>
 
@@ -52,8 +44,8 @@ export default {
   ></div>
   <dialog :open="showDialog">
     <div class="dialog-header">
-      <h3 v-if="noteId">Edit Note</h3>
-      <h3 v-else-if="!noteId">Add Note</h3>
+      <h3 v-if="edit">Edit Note</h3>
+      <h3 v-else>Add Note</h3>
       <div
         @click="toggleShowDialog()"
         title="close dialog"
@@ -68,9 +60,8 @@ export default {
         <div>
           <input
             required
-            autofocus
             name="title"
-            v-model="title"
+            v-model="inputData.title"
             type="text"
             placeholder="Note title..."
             class="title-input"
@@ -79,7 +70,7 @@ export default {
         <div>
           <textarea
             name="detail"
-            v-model="detail"
+            v-model="inputData.detail"
             placeholder="Optional details..."
             cols="30"
           />
@@ -121,7 +112,7 @@ form > button {
 .dialog-close {
   background-color: crimson;
   color: white;
-  padding: 0.2rem 0.4rem;
+  padding: 0.2rem 0.6rem;
   cursor: pointer;
 }
 .dialog-body {

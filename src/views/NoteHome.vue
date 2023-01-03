@@ -1,67 +1,39 @@
-<script lang="ts">
-import { reactive, computed } from "vue";
+<script setup lang="ts">
 import Note from "@/components/Note.vue";
-import type { NoteT } from "index";
-import NoteInputDialog from "@/components/NoteInputDialog.vue";
 import useToggle from "@/hooks/useToggle";
-import {
-  addNoteFn,
-  clearNotesFn,
-  deleteNoteFn,
-  editNoteFn,
-  getDoneNote,
-  getNotesFromStorage,
-  sortUndoneFirst,
-  toggleDoneFn,
-} from "@/utils/homeUtils";
+import useNoteStore from "@/stores/useNoteStore";
+import { computed, defineAsyncComponent } from "vue";
 
-export default {
-  setup() {
-    const notesData = reactive<Record<"notes", NoteT[]>>({
-      notes: getNotesFromStorage(localStorage),
-    });
+const NoteInput = defineAsyncComponent(
+  () => import("@/components/NoteInput.vue")
+);
 
-    const sortedNotes = computed(() =>
-      [...notesData.notes].sort(sortUndoneFirst)
-    );
-    const notesCount = computed(() => notesData.notes.length);
-    const doneNotesCount = computed(
-      () => notesData.notes.filter(getDoneNote).length
-    );
-    const pendingNotes = computed(
-      () => notesCount.value - doneNotesCount.value
-    );
+const { noteStore, clearNotes } = useNoteStore();
 
-    return {
-      ...useToggle(),
-      sortedNotes,
-      notesCount,
-      doneNotesCount,
-      pendingNotes,
-      addNote: addNoteFn(notesData),
-      clearNotes: clearNotesFn(notesData),
-      toggleDone: toggleDoneFn(notesData),
-      deleteNote: deleteNoteFn(notesData),
-      editNote: editNoteFn(notesData),
-    };
-  },
-  components: { Note, NoteInputDialog },
-};
+const { showDialog, toggleShowDialog } = useToggle();
+
+const notesCount = computed(() => noteStore.notes.length);
+const doneNotesCount = computed(
+  () => noteStore.notes.filter((note) => note.isDone).length
+);
+const pendingNotesCount = computed(
+  () => notesCount.value - doneNotesCount.value
+);
+// sort undone notes first
+const sortedNotes = computed(() =>
+  noteStore.notes.sort((a, b) => Number(a.isDone) - Number(b.isDone))
+);
 </script>
 
 <template>
   <main>
     <div class="note-stats">
-      <div>Notes: {{ notesCount }}</div>
+      <div>Notes: {{ noteStore.notes.length }}</div>
       <div>Done: {{ doneNotesCount }}</div>
-      <div>Pending: {{ pendingNotes }}</div>
+      <div>Pending: {{ pendingNotesCount }}</div>
     </div>
 
-    <NoteInputDialog
-      :addNote="addNote"
-      :showDialog="showDialog"
-      :toggleShowDialog="toggleShowDialog"
-    />
+    <NoteInput :showDialog="showDialog" :toggleShowDialog="toggleShowDialog" />
 
     <div class="action-buttons">
       <button @click="toggleShowDialog">Add Note</button>
@@ -72,13 +44,7 @@ export default {
 
     <div class="notes">
       <div v-for="note in sortedNotes">
-        <Note
-          :key="note.id"
-          :note="note"
-          :toggleDone="toggleDone"
-          :deleteNote="deleteNote"
-          :editNote="editNote"
-        />
+        <Note :key="note.id" v-bind="note" />
       </div>
     </div>
 
@@ -101,6 +67,9 @@ textarea:focus {
 </style>
 
 <style scoped lang="css">
+main {
+  margin: 0 0 10rem;
+}
 .list-placeholder {
   text-align: center;
   margin-top: 2rem;
