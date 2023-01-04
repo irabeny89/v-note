@@ -2,7 +2,7 @@
 import Note from "@/components/Note.vue";
 import useToggle from "@/hooks/useToggle";
 import useNoteStore from "@/stores/useNoteStore";
-import { computed, defineAsyncComponent } from "vue";
+import { computed, defineAsyncComponent, onMounted, onUpdated } from "vue";
 
 const NoteInput = defineAsyncComponent(
   () => import("@/components/NoteInput.vue")
@@ -20,8 +20,11 @@ const pendingNotesCount = computed(
   () => notesCount.value - doneNotesCount.value
 );
 // sort undone notes first
-const sortedNotes = noteStore.notes.sort(
-  (a, b) => Number(a.isDone) - Number(b.isDone)
+onMounted(() =>
+  noteStore.notes.sort((a, b) => Number(a.isDone) - Number(b.isDone))
+);
+onUpdated(() =>
+  noteStore.notes.sort((a, b) => Number(a.isDone) - Number(b.isDone))
 );
 </script>
 
@@ -43,7 +46,7 @@ const sortedNotes = noteStore.notes.sort(
     </div>
 
     <div class="notes">
-      <div v-for="note in sortedNotes">
+      <div v-for="note in noteStore.notes">
         <Note :key="note.id" v-bind="note" />
       </div>
     </div>
