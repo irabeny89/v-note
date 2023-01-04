@@ -5,6 +5,6 @@ export type NoteT = {
   isDone: boolean;
   createdAt: string;
   updatedAt: string;
-}
-export type NoteEditDataT = Pick<NoteT, "id" | "title" | "detail">
-export type NoteStoreT = Record<"notes", NoteT[]>
+};
+export type NoteEditDataT = Pick<NoteT, "id" | "title" | "detail">;
+export type NoteStoreT = Record<"notes", NoteT[]>;

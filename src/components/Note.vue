@@ -7,7 +7,6 @@ const NoteInput = defineAsyncComponent(
   () => import("@/components/NoteInput.vue")
 );
 
-
 const { createdAt, id, isDone, title, updatedAt, detail } = defineProps<{
   id: string;
   title: string;

@@ -20,8 +20,8 @@ const pendingNotesCount = computed(
   () => notesCount.value - doneNotesCount.value
 );
 // sort undone notes first
-const sortedNotes = computed(() =>
-  noteStore.notes.sort((a, b) => Number(a.isDone) - Number(b.isDone))
+const sortedNotes = noteStore.notes.sort(
+  (a, b) => Number(a.isDone) - Number(b.isDone)
 );
 </script>
 

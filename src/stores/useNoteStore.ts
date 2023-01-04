@@ -11,14 +11,17 @@ import { defineStore } from "pinia";
 import { reactive } from "vue";
 
 const useNoteStore = defineStore("noteStore", () => {
-  const noteStore = reactive<NoteStoreT>({ notes: getNotesFromStorage(localStorage) })
+  const noteStore = reactive<NoteStoreT>({
+    notes: getNotesFromStorage(localStorage),
+  });
 
   return {
     noteStore,
     addNote: createAddNote(noteStore),
-    clearNotes: createClearNotes(noteStore), editNote: createEditNote(noteStore),
+    clearNotes: createClearNotes(noteStore),
+    editNote: createEditNote(noteStore),
     deleteNote: createDeleteNote(noteStore),
-    toggleDone: createToggleDone(noteStore)
-  }
-})
-export default useNoteStore
+    toggleDone: createToggleDone(noteStore),
+  };
+});
+export default useNoteStore;

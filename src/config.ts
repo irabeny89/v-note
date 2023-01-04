@@ -1,1 +1,1 @@
-export const NOTES_KEY = "vNotes"
+export const NOTES_KEY = "vNotes";
